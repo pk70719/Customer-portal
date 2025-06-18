@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customer Dashboard – Suriyawan Saffari</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    🧾 My Dashboard – Suriyawan Saffari
+  </header>
+
+  <nav>
+    <button onclick="navigate('home')">🏠 Home</button>
+    <button onclick="navigate('products')">🛒 Products</button>
+    <button onclick="navigate('orders')">📦 Orders</button>
+    <button onclick="navigate('profile')">👤 Profile</button>
+    <button onclick="logoutCustomer()">🚪 Logout</button>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>👋 Hello, <span id="customerName">Customer</span></h2>
+      <p class="status" id="dashboardStatus">Dashboard loaded successfully.</p>
+      <p class="info">You can track orders, update your profile, or browse new products.</p>
+    </div>
+
+    <div id="helpdesk" class="card">
+      <h3>💬 Need Help? Chat with Support</h3>
+      <input type="text" id="dashboardChatInput" placeholder="Ask a question..." />
+      <button onclick="askDashboardAI()">Send</button>
+      <div id="dashboardChatResponse" class="info"></div>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Suriyawan Saffari – Customer Support | Dashboard
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – Suriyawan Saffari</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .login-box {
+      margin-top: 60px;
+      padding: 25px;
+      background: #fff8f0;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .login-box button {
+      background-color: #ff9800;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .login-box button:hover {
+      background-color: #e67e22;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    🔐 Customer Login – Suriyawan Saffari
+  </header>
+
+  <div class="container">
+    <div class="login-box">
+      <h2>Welcome Back</h2>
+      <input type="text" id="loginEmail" placeholder="📧 Email or Mobile" />
+      <input type="password" id="loginPassword" placeholder="🔑 Password" />
+      <button onclick="loginCustomer()">Login</button>
+      <p class="info" id="loginMessage"></p>
+      <p class="info">New user? <a href="register.html">Register here</a></p>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Suriyawan Saffari – All rights reserved
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
