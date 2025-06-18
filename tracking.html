@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tracking Generator</title>
+  <style>
+    body { font-family: Arial; padding: 2rem; background: #f5f5f5; }
+    input, button { margin: 5px; padding: 8px; }
+    .card { background: white; padding: 1rem; margin: 1rem 0; border-radius: 8px; box-shadow: 0 0 4px #aaa; }
+  </style>
+</head>
+<body>
+  <h2>📦 Tracking ID Generator</h2>
+
+  <div>
+    <input id="pname" placeholder="Product Name" />
+    <input id="price" placeholder="Price" />
+    <input id="cname" placeholder="Customer Name" />
+    <input id="addr" placeholder="Address" />
+    <input id="mobile" placeholder="Mobile" />
+    <button onclick="create()">Generate</button>
+  </div>
+
+  <h3>🔍 Search Tracking ID:</h3>
+  <input id="search" placeholder="Enter ID" oninput="load()" />
+
+  <div id="output"></div>
+
+  <script>
+    const token = localStorage.getItem("ownerToken");
+
+    function create() {
+      const data = {
+        productName: pname.value,
+        price: price.value,
+        customerName: cname.value,
+        address: addr.value,
+        mobile: mobile.value,
+      };
+
+      fetch("https://suriyawan-backend-18.onrender.com/api/tracking/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token,
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert("✅ Tracking ID: " + res.trackingId);
+          load();
+        }
+      });
+    }
+
+    function load() {
+      const query = search.value;
+      fetch(`https://suriyawan-backend-18.onrender.com/api/tracking/all?search=${query}`, {
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          output.innerHTML = res.data.map(x => `
+            <div class="card">
+              <b>Tracking ID:</b> ${x.trackingId} <br>
+              <b>Product:</b> ${x.productName} | ₹${x.price}<br>
+              <b>Customer:</b> ${x.customerName} (${x.mobile})<br>
+              <b>Address:</b> ${x.address}<br>
+              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" />
+            </div>
+          `).join("");
+        }
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>
