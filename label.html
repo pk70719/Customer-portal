@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Parcel Label</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial; padding: 2rem; background: #fff; }
+    .label { border: 1px dashed #000; padding: 2rem; width: 500px; margin: auto; }
+    h2 { text-align: center; }
+    .barcode { margin: 1rem 0; text-align: center; }
+    .details { font-size: 1rem; }
+    button { margin-top: 2rem; background: black; color: white; padding: 10px; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="label">
+    <h2>Parcel Label</h2>
+    <div class="details">
+      <p><strong>Tracking ID:</strong> <span id="trackId">Loading...</span></p>
+      <p><strong>Customer:</strong> <span id="name">Loading...</span></p>
+      <p><strong>Address:</strong> <span id="address">Loading...</span></p>
+      <p><strong>Phone:</strong> <span id="mobile">Loading...</span></p>
+    </div>
+    <div class="barcode" id="barcodeArea">[Barcode Here]</div>
+    <button onclick="window.print()">Print Label</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/jsbarcode/3.11.0/JsBarcode.all.min.js"></script>
+  <script>
+    const data = JSON.parse(localStorage.getItem("labelData")) || {
+      id: "TRK12345678", name: "Ravi", address: "Suriyawan, UP", mobile: "9876543210"
+    };
+
+    document.getElementById("trackId").textContent = data.id;
+    document.getElementById("name").textContent = data.name;
+    document.getElementById("address").textContent = data.address;
+    document.getElementById("mobile").textContent = data.mobile;
+
+    const svg = document.createElement("svg");
+    JsBarcode(svg, data.id, { format: "CODE128", width: 2, height: 50 });
+    document.getElementById("barcodeArea").appendChild(svg);
+  </script>
+</body>
+</html>
