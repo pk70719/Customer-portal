@@ -1,5 +1,5 @@
 // ✅ Customer Portal Script – D1 to D25
-const BASE_URL = "https://suriyawan-saffari-backend.onrender.com";
+const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
 
 // ✅ D1: DOM Load
 document.addEventListener("DOMContentLoaded", () => {
