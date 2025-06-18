@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Invoice - Suriyawan Saffari</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; background: #f7f7f7; }
+    .invoice-box {
+      background: white;
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #333; text-align: center; }
+    table { width: 100%; margin-top: 1rem; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    .totals td { font-weight: bold; }
+    .print-btn { margin-top: 1rem; display: block; text-align: center; }
+    button { padding: 10px 20px; background: #1890ff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #0050b3; }
+  </style>
+</head>
+<body>
+  <div class="invoice-box">
+    <h1>🧾 Invoice</h1>
+    <p><strong>Invoice ID:</strong> <span id="invoiceId">Loading...</span></p>
+    <p><strong>Customer Name:</strong> <span id="customerName">Loading...</span></p>
+    <p><strong>Address:</strong> <span id="customerAddress">Loading...</span></p>
+    <p><strong>Mobile:</strong> <span id="customerMobile">Loading...</span></p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price (₹)</th>
+          <th>Total (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="itemRows">
+        <!-- Items will be inserted here -->
+      </tbody>
+      <tfoot class="totals">
+        <tr>
+          <td colspan="3">Grand Total</td>
+          <td id="grandTotal">0</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="print-btn">
+      <button onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+  </div>
+
+  <script>
+    // Dummy example data (you can load from localStorage or API)
+    const invoiceData = JSON.parse(localStorage.getItem("invoiceData")) || {
+      id: "INV12345678",
+      customerName: "Ravi Kumar",
+      address: "Suriyawan, Bhadohi, UP",
+      mobile: "9876543210",
+      items: [
+        { name: "Shirt", qty: 2, price: 499 },
+        { name: "Shoes", qty: 1, price: 1199 }
+      ]
+    };
+
+    document.getElementById("invoiceId").textContent = invoiceData.id;
+    document.getElementById("customerName").textContent = invoiceData.customerName;
+    document.getElementById("customerAddress").textContent = invoiceData.address;
+    document.getElementById("customerMobile").textContent = invoiceData.mobile;
+
+    const rowsContainer = document.getElementById("itemRows");
+    let grandTotal = 0;
+    invoiceData.items.forEach(item => {
+      const total = item.qty * item.price;
+      grandTotal += total;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.qty}</td>
+        <td>₹${item.price}</td>
+        <td>₹${total}</td>
+      `;
+      rowsContainer.appendChild(row);
+    });
+    document.getElementById("grandTotal").textContent = "₹" + grandTotal;
+  </script>
+</body>
+</html>
