@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>📦 Tracking Generator – Suriyawan Saffari</title>
+  <title>📦 Suriyawan Tracking Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -80,28 +80,39 @@
     <button onclick="create()">➕ Generate Tracking ID</button>
   </div>
 
-  <h3>🔍 Search Tracking ID</h3>
-  <input id="search" placeholder="Enter Tracking ID or Name" oninput="load()" />
+  <h3>🔍 Search Tracking</h3>
+  <input id="search" placeholder="Tracking ID / Name" oninput="load()" />
 
   <div id="output"></div>
 
   <script>
     const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
-    const token = localStorage.getItem("ownerToken") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InByYWRlZXBzZXRoNjQ2IiwiaWF0IjoxNzQ5ODk5NzI4LCJleHAiOjE3NDk5MDY5Mjh9.xFpbbAnE1MphCMDQQXprpsURy-x4UK7DrR_lFjlTVYE";
+
+    // ✅ Use static token if not present
+    let token = localStorage.getItem("ownerToken");
+    if (!token) {
+      token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InByYWRlZXBzZXRoNjQ2IiwiaWF0IjoxNzQ5ODk5NzI4LCJleHAiOjE3NDk5MDY5Mjh9.xFpbbAnE1MphCMDQQXprpsURy-x4UK7DrR_lFjlTVYE";
+      localStorage.setItem("ownerToken", token);
+    }
 
     function create() {
-      const data = {
-        productName: document.getElementById("pname").value.trim(),
-        price: document.getElementById("price").value.trim(),
-        customerName: document.getElementById("cname").value.trim(),
-        address: document.getElementById("addr").value.trim(),
-        mobile: document.getElementById("mobile").value.trim(),
-      };
+      const pname = document.getElementById("pname").value.trim();
+      const price = document.getElementById("price").value.trim();
+      const cname = document.getElementById("cname").value.trim();
+      const addr = document.getElementById("addr").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
 
-      if (!data.productName || !data.price || !data.customerName || !data.address || !data.mobile) {
-        alert("⚠️ All fields are required!");
-        return;
+      if (!pname || !price || !cname || !addr || !mobile) {
+        return alert("⚠️ Please fill all fields.");
       }
+
+      const data = {
+        productName: pname,
+        price: price,
+        customerName: cname,
+        address: addr,
+        mobile: mobile
+      };
 
       fetch(`${BASE_URL}/api/tracking/create`, {
         method: "POST",
@@ -114,43 +125,50 @@
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert("✅ Tracking ID created: " + res.trackingId);
+          alert("✅ Tracking Created: " + res.trackingId);
           load();
         } else {
           alert("❌ Failed: " + (res.message || "Unknown error"));
         }
       })
-      .catch(() => alert("❌ Server error"));
+      .catch(err => {
+        alert("❌ Server error. Check network or backend.");
+        console.error(err);
+      });
     }
 
     function load() {
-      const query = document.getElementById("search").value.trim();
+      const search = document.getElementById("search").value.trim();
 
-      fetch(`${BASE_URL}/api/tracking/all?search=${query}`, {
-        headers: { "Authorization": "Bearer " + token }
+      fetch(`${BASE_URL}/api/tracking/all?search=${search}`, {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
       })
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          document.getElementById("output").innerHTML = res.data.map(x => `
+          const html = res.data.map(x => `
             <div class="card">
               <b>🆔 Tracking ID:</b> ${x.trackingId}<br>
-              <b>📦 Product:</b> ${x.productName} (₹${x.price})<br>
-              <b>👤 Customer:</b> ${x.customerName} | ${x.mobile}<br>
+              <b>📦 Product:</b> ${x.productName} – ₹${x.price}<br>
+              <b>👤 Customer:</b> ${x.customerName} (${x.mobile})<br>
               <b>🏠 Address:</b> ${x.address}<br>
-              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" alt="Barcode">
+              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" />
             </div>
           `).join("");
+          document.getElementById("output").innerHTML = html;
         } else {
-          document.getElementById("output").innerHTML = "<p>❌ No results found.</p>";
+          document.getElementById("output").innerHTML = "<p>❌ No data found</p>";
         }
       })
-      .catch(() => {
-        document.getElementById("output").innerHTML = "<p>❌ Failed to load data.</p>";
+      .catch(err => {
+        document.getElementById("output").innerHTML = "<p>❌ Network error</p>";
+        console.error(err);
       });
     }
 
-    // Load on start
+    // ✅ Load data on start
     load();
   </script>
 </body>
