@@ -38,7 +38,7 @@
         mobile: mobile.value,
       };
 
-      fetch("https://suriyawan-backend-18.onrender.com/api/tracking/create", {
+      fetch("https://suriyawan-backend-68z3.onrender.com/api/tracking/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +57,7 @@
 
     function load() {
       const query = search.value;
-      fetch(`https://suriyawan-backend-18.onrender.com/api/tracking/all?search=${query}`, {
+      fetch(`https://suriyawan-backend-68z3.onrender.com/api/tracking/all?search=${query}`, {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(res => res.json())
