@@ -1,103 +1,133 @@
-/* Reset */
+/* 🌐 Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Global Layout */
+/* 🧱 Layout */
 body {
   font-family: 'Segoe UI', 'Roboto', sans-serif;
   background-color: #fefefe;
   color: #212529;
   line-height: 1.6;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
 }
 
-/* Header */
+/* 🧢 Header */
 header {
   width: 100%;
   background-color: #ff6f00;
   color: #fff;
   text-align: center;
-  padding: 20px 0;
+  padding: 18px 0;
   font-size: 26px;
   font-weight: bold;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   border-radius: 0 0 10px 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Navigation */
+/* 🧭 Navigation */
 nav {
   background: #fff3e0;
   width: 100%;
   display: flex;
   justify-content: center;
+  gap: 12px;
   flex-wrap: wrap;
-  gap: 14px;
-  padding: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 nav button {
   background-color: #ff9800;
   color: #fff;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s ease;
+  font-size: 15px;
+  transition: all 0.2s ease-in-out;
 }
 
 nav button:hover {
   background-color: #e67e22;
 }
 
-/* Main Content */
+/* 📦 Card Container */
 .container {
   width: 95%;
-  max-width: 850px;
+  max-width: 900px;
   padding: 20px;
-  margin: auto;
 }
 
-/* Card UI Box */
+/* 🧾 Card */
 .card {
   background: #fff8f0;
-  padding: 24px;
+  padding: 22px;
   border-radius: 12px;
-  margin-top: 20px;
+  margin: 20px 0;
   box-shadow: 0 0 10px rgba(0,0,0,0.06);
 }
 
-/* Card Heading */
-.card h2,
-.card-title {
+.card h2 {
   font-size: 20px;
   font-weight: bold;
   color: #333;
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* 🛠 Universal Button */
+.btn {
+  background-color: #ff9800;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #e67e22;
+}
+
+/* ✍ Input Field */
+.input-box {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
   margin-bottom: 10px;
 }
 
-/* Status Text */
+/* 📡 Status */
 .status {
-  font-size: 15px;
+  font-size: 14px;
   color: green;
   margin-top: 10px;
 }
 
-/* Info Text */
+/* 🧾 Info */
 .info {
   font-size: 14px;
-  color: #555;
+  color: #444;
   margin-top: 10px;
 }
 
-/* Help Desk Chatbox */
+/* 🤖 Helpdesk Box */
 #helpdesk {
   background: #fff;
   border: 1px solid #ccc;
@@ -136,7 +166,7 @@ nav button:hover {
   background-color: #0097a7;
 }
 
-/* Footer */
+/* 🧩 Footer */
 footer {
   margin-top: 40px;
   font-size: 13px;
@@ -144,78 +174,23 @@ footer {
   text-align: center;
 }
 
-/* Universal Button */
-.btn {
-  background-color: #ff9800;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
+/* 📏 Utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
 
-.btn:hover {
-  background-color: #e67e22;
-}
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-20 { margin-bottom: 20px; }
 
-/* Universal Input */
-.input-box {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #aaa;
-  margin-bottom: 10px;
-}
+.p-10 { padding: 10px; }
+.p-20 { padding: 20px; }
 
-/* Text Align Utilities */
-.text-center {
-  text-align: center;
-}
+.flex { display: flex; }
+.flex-center { justify-content: center; align-items: center; }
+.flex-column { flex-direction: column; }
 
-.text-left {
-  text-align: left;
-}
-
-/* Margin Utilities */
-.mt-10 {
-  margin-top: 10px;
-}
-.mt-20 {
-  margin-top: 20px;
-}
-.mb-10 {
-  margin-bottom: 10px;
-}
-.mb-20 {
-  margin-bottom: 20px;
-}
-
-/* Padding Utilities */
-.p-10 {
-  padding: 10px;
-}
-.p-20 {
-  padding: 20px;
-}
-
-/* Flexbox Utilities */
-.flex {
-  display: flex;
-}
-.flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Mobile Responsive */
+/* 📱 Responsive */
 @media screen and (max-width: 600px) {
   nav {
     flex-direction: column;
@@ -224,24 +199,20 @@ footer {
 
   nav button {
     width: 90%;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
-  #helpdesk input {
+  #helpdesk input,
+  #helpdesk button {
     width: 100%;
     margin-bottom: 10px;
   }
 
-  #helpdesk button {
-    width: 100%;
-    margin-left: 0;
+  .container {
+    padding: 10px;
   }
 
   .card {
-    padding: 20px 15px;
-  }
-
-  .container {
-    padding: 10px;
+    padding: 18px 15px;
   }
 }
