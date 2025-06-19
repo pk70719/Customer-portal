@@ -2,141 +2,93 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Suriyawan Live Tracking</title>
+  <title>Suriyawan Tracking</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      padding: 20px;
-    }
-    h2 {
-      color: #e65100;
-    }
+    body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
     input, button {
-      display: block;
-      width: 100%;
-      max-width: 400px;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      width: 100%; max-width: 400px; padding: 10px; margin: 10px 0;
+      border-radius: 5px; border: 1px solid #ccc; font-size: 15px;
     }
     button {
-      background-color: #ff9800;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #e67e22;
+      background: orange; color: white; font-weight: bold; border: none;
     }
     .card {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      background: #fff; padding: 15px; margin: 15px 0;
+      border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
-    .card img {
-      margin-top: 10px;
-      height: 50px;
-    }
-    #output {
-      margin-top: 20px;
-    }
-    @media(max-width: 600px) {
-      input, button {
-        width: 100%;
-      }
-    }
+    .card img { height: 50px; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <h2>📦 Generate New Tracking</h2>
+  <h2>➕ Create Tracking ID</h2>
   <input id="pname" placeholder="Product Name" />
   <input id="price" placeholder="Price (₹)" />
   <input id="cname" placeholder="Customer Name" />
   <input id="addr" placeholder="Address" />
   <input id="mobile" placeholder="Mobile Number" />
-  <button onclick="create()">➕ Create Tracking ID</button>
+  <button onclick="create()">Create</button>
 
-  <h2>🔍 Search Tracking</h2>
-  <input id="search" placeholder="Search by ID or Name" oninput="load()" />
+  <h2>🔍 Search</h2>
+  <input id="search" placeholder="Tracking ID or Name" oninput="load()" />
 
   <div id="output"></div>
 
   <script>
-    const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
+    const BASE = "https://suriyawan-backend-68z3.onrender.com";
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InByYWRlZXBzZXRoNjQ2IiwiaWF0IjoxNzQ5ODk5NzI4LCJleHAiOjE3NDk5MDY5Mjh9.xFpbbAnE1MphCMDQQXprpsURy-x4UK7DrR_lFjlTVYE";
 
     function create() {
       const data = {
-        productName: document.getElementById("pname").value.trim(),
-        price: document.getElementById("price").value.trim(),
-        customerName: document.getElementById("cname").value.trim(),
-        address: document.getElementById("addr").value.trim(),
-        mobile: document.getElementById("mobile").value.trim()
+        productName: pname.value.trim(),
+        price: price.value.trim(),
+        customerName: cname.value.trim(),
+        address: addr.value.trim(),
+        mobile: mobile.value.trim()
       };
+      if (Object.values(data).includes("")) return alert("⚠️ All fields required.");
 
-      if (!data.productName || !data.price || !data.customerName || !data.address || !data.mobile) {
-        return alert("⚠️ Please fill all fields.");
-      }
-
-      fetch(`${BASE_URL}/api/tracking/create`, {
+      fetch(`${BASE}/api/tracking/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
+          Authorization: "Bearer " + token
         },
         body: JSON.stringify(data)
       })
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert("✅ Tracking ID created: " + res.trackingId);
+          alert("✅ Created: " + res.trackingId);
           load();
         } else {
-          alert("❌ Failed: " + (res.message || "Unknown error"));
+          alert("❌ Error: " + (res.message || "Unknown"));
         }
-      })
-      .catch(err => {
-        alert("❌ Server error");
-        console.error(err);
       });
     }
 
     function load() {
-      const search = document.getElementById("search").value.trim();
-
-      fetch(`${BASE_URL}/api/tracking/all?search=${search}`, {
-        headers: {
-          "Authorization": "Bearer " + token
-        }
+      const q = document.getElementById("search").value.trim();
+      fetch(`${BASE}/api/tracking/all?search=${q}`, {
+        headers: { Authorization: "Bearer " + token }
       })
       .then(res => res.json())
       .then(res => {
-        const output = document.getElementById("output");
+        const out = document.getElementById("output");
         if (res.success && res.data.length) {
-          output.innerHTML = res.data.map(item => `
+          out.innerHTML = res.data.map(x => `
             <div class="card">
-              <b>🆔 Tracking ID:</b> ${item.trackingId}<br>
-              <b>📦 Product:</b> ${item.productName} (₹${item.price})<br>
-              <b>👤 Customer:</b> ${item.customerName} (${item.mobile})<br>
-              <b>🏠 Address:</b> ${item.address}<br>
-              <img src="https://barcode.tec-it.com/barcode.ashx?data=${item.trackingId}&code=Code128" alt="barcode" />
+              <b>ID:</b> ${x.trackingId}<br>
+              <b>Product:</b> ${x.productName} (₹${x.price})<br>
+              <b>Name:</b> ${x.customerName} | ${x.mobile}<br>
+              <b>Address:</b> ${x.address}<br>
+              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" />
             </div>
           `).join("");
         } else {
-          output.innerHTML = "<p>❌ No tracking data found.</p>";
+          out.innerHTML = "<p>❌ No data found.</p>";
         }
-      })
-      .catch(err => {
-        document.getElementById("output").innerHTML = "<p>❌ Network error</p>";
-        console.error(err);
       });
     }
 
