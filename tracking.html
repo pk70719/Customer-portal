@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>📦 Suriyawan Live Tracking System</title>
+  <title>📦 Suriyawan Live Tracking</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f9f9f9;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
       padding: 20px;
     }
 
     h2 {
-      color: #d84315;
-      margin-bottom: 12px;
+      color: #e65100;
     }
 
     input, button {
@@ -21,7 +20,7 @@
       width: 100%;
       max-width: 400px;
       padding: 10px;
-      margin: 6px 0;
+      margin: 10px 0;
       font-size: 15px;
       border-radius: 5px;
       border: 1px solid #ccc;
@@ -36,15 +35,15 @@
     }
 
     button:hover {
-      background-color: #f57c00;
+      background-color: #e67e22;
     }
 
     .card {
-      background: #fff;
+      background: white;
       padding: 15px;
-      margin: 12px 0;
       border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin: 15px 0;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
 
     .card img {
@@ -55,38 +54,46 @@
     #output {
       margin-top: 20px;
     }
+
+    @media(max-width: 600px) {
+      input, button {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <h2>📦 Generate Tracking ID</h2>
-  <input id="productName" placeholder="Product Name" />
+  <h2>📦 Generate New Tracking</h2>
+  <input id="pname" placeholder="Product Name" />
   <input id="price" placeholder="Price (₹)" />
-  <input id="customerName" placeholder="Customer Name" />
-  <input id="address" placeholder="Address" />
+  <input id="cname" placeholder="Customer Name" />
+  <input id="addr" placeholder="Address" />
   <input id="mobile" placeholder="Mobile Number" />
-  <button onclick="generateTracking()">➕ Generate</button>
+  <button onclick="create()">➕ Create Tracking ID</button>
 
   <h2>🔍 Search Tracking</h2>
-  <input id="search" placeholder="Enter Tracking ID or Name" oninput="searchTracking()" />
+  <input id="search" placeholder="Search by ID or Name" oninput="load()" />
 
   <div id="output"></div>
 
   <script>
     const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
+
+    // ✅ Static working token
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InByYWRlZXBzZXRoNjQ2IiwiaWF0IjoxNzQ5ODk5NzI4LCJleHAiOjE3NDk5MDY5Mjh9.xFpbbAnE1MphCMDQQXprpsURy-x4UK7DrR_lFjlTVYE";
 
-    function generateTracking() {
+    function create() {
       const data = {
-        productName: document.getElementById("productName").value.trim(),
+        productName: document.getElementById("pname").value.trim(),
         price: document.getElementById("price").value.trim(),
-        customerName: document.getElementById("customerName").value.trim(),
-        address: document.getElementById("address").value.trim(),
+        customerName: document.getElementById("cname").value.trim(),
+        address: document.getElementById("addr").value.trim(),
         mobile: document.getElementById("mobile").value.trim()
       };
 
       if (Object.values(data).some(val => !val)) {
-        return alert("⚠️ All fields are required.");
+        return alert("⚠️ Please fill all fields.");
       }
 
       fetch(`${BASE_URL}/api/tracking/create`, {
@@ -100,16 +107,19 @@
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert("✅ Tracking ID created: " + res.trackingId);
-          searchTracking(); // Refresh list
+          alert("✅ Tracking ID: " + res.trackingId);
+          load(); // Refresh
         } else {
-          alert("❌ " + (res.message || "Error occurred."));
+          alert("❌ Failed: " + (res.message || "Unknown error"));
         }
       })
-      .catch(() => alert("❌ Network error"));
+      .catch(err => {
+        alert("❌ Server or network issue");
+        console.error(err);
+      });
     }
 
-    function searchTracking() {
+    function load() {
       const search = document.getElementById("search").value.trim();
 
       fetch(`${BASE_URL}/api/tracking/all?search=${search}`, {
@@ -121,26 +131,27 @@
       .then(res => {
         const output = document.getElementById("output");
         if (res.success && res.data.length) {
-          output.innerHTML = res.data.map(x => `
+          output.innerHTML = res.data.map(item => `
             <div class="card">
-              <b>🆔 ID:</b> ${x.trackingId}<br>
-              <b>📦 Product:</b> ${x.productName} (₹${x.price})<br>
-              <b>👤 Customer:</b> ${x.customerName} (${x.mobile})<br>
-              <b>🏠 Address:</b> ${x.address}<br>
-              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" alt="Barcode" />
+              <b>🆔 Tracking ID:</b> ${item.trackingId}<br>
+              <b>📦 Product:</b> ${item.productName} (₹${item.price})<br>
+              <b>👤 Customer:</b> ${item.customerName} (${item.mobile})<br>
+              <b>🏠 Address:</b> ${item.address}<br>
+              <img src="https://barcode.tec-it.com/barcode.ashx?data=${item.trackingId}&code=Code128" />
             </div>
           `).join("");
         } else {
-          output.innerHTML = "<p>❌ No matching records found.</p>";
+          output.innerHTML = "<p>❌ No data found.</p>";
         }
       })
-      .catch(() => {
-        document.getElementById("output").innerHTML = "<p>❌ Server error</p>";
+      .catch(err => {
+        document.getElementById("output").innerHTML = "<p>❌ Network error</p>";
+        console.error(err);
       });
     }
 
-    // Auto-load on open
-    searchTracking();
+    // Load initial
+    load();
   </script>
 </body>
 </html>
