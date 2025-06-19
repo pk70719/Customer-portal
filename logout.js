@@ -1,41 +1,54 @@
 // logout.js
 
-// 🔐 Logout function
+// 🔐 Secure Logout Function
 function logoutUser() {
-  // 🧹 Clear localStorage tokens
-  localStorage.removeItem("ownerToken");
-  localStorage.removeItem("sellerToken");
-  localStorage.removeItem("customerToken");
-  localStorage.removeItem("deliveryToken");
-  localStorage.removeItem("ownerData");
-  localStorage.removeItem("sellerData");
-  localStorage.removeItem("customerData");
-  localStorage.removeItem("deliveryData");
+  try {
+    // 🧹 Clear all authentication tokens and user data
+    localStorage.removeItem("ownerToken");
+    localStorage.removeItem("sellerToken");
+    localStorage.removeItem("customerToken");
+    localStorage.removeItem("deliveryToken");
 
-  // 🔁 Optional: Clear session storage (if used)
-  sessionStorage.clear();
+    localStorage.removeItem("ownerData");
+    localStorage.removeItem("sellerData");
+    localStorage.removeItem("customerData");
+    localStorage.removeItem("deliveryData");
 
-  // 🚪 Redirect to login page
-  if (window.location.pathname.includes("owner")) {
-    window.location.href = "login.html";
-  } else if (window.location.pathname.includes("seller")) {
-    window.location.href = "../seller/login.html";
-  } else if (window.location.pathname.includes("customer")) {
-    window.location.href = "../customer/login.html";
-  } else if (window.location.pathname.includes("delivery")) {
-    window.location.href = "../delivery/login.html";
-  } else {
-    window.location.href = "login.html";
+    // Optional: Clear other temp data
+    localStorage.removeItem("invoiceData");
+    localStorage.removeItem("labelData");
+
+    // 🧼 Clear sessionStorage if used
+    sessionStorage.clear();
+
+    // ✅ Redirect to respective login page
+    const path = window.location.pathname.toLowerCase();
+
+    if (path.includes("owner")) {
+      window.location.href = "/Owner-portal/login.html";
+    } else if (path.includes("seller")) {
+      window.location.href = "/Seller-portal/login.html";
+    } else if (path.includes("customer")) {
+      window.location.href = "/Customer-portal/login.html";
+    } else if (path.includes("delivery")) {
+      window.location.href = "/Delivery-portal/login.html";
+    } else {
+      window.location.href = "/index.html";
+    }
+  } catch (error) {
+    alert("❌ Logout failed. Please try again.");
+    console.error("Logout error:", error);
   }
 }
 
-// 🔘 Event listener (if logout button exists)
+// 🔘 Bind to Logout Button (if exists)
 document.addEventListener("DOMContentLoaded", () => {
-  const logoutBtn = document.getElementById("logout-btn");
+  const logoutBtn = document.getElementById("logout-btn") || document.querySelector("button[onclick*='logoutCustomer']");
+
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      const confirmLogout = confirm("🔒 Are you sure you want to logout?");
+      const confirmLogout = confirm("🚪 Are you sure you want to logout?");
       if (confirmLogout) logoutUser();
     });
   }
