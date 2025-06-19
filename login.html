@@ -4,8 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login – Suriyawan Saffari</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      background: #ff9800;
+      width: 100%;
+      text-align: center;
+      padding: 20px 0;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
     .login-box {
       margin-top: 60px;
       padding: 25px;
@@ -40,6 +59,18 @@
     .login-box button:hover {
       background-color: #e67e22;
     }
+
+    .info {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 13px;
+      color: #888;
+    }
   </style>
 </head>
 <body>
@@ -48,21 +79,57 @@
     🔐 Customer Login – Suriyawan Saffari
   </header>
 
-  <div class="container">
-    <div class="login-box">
-      <h2>Welcome Back</h2>
-      <input type="text" id="loginEmail" placeholder="📧 Email or Mobile" />
-      <input type="password" id="loginPassword" placeholder="🔑 Password" />
-      <button onclick="loginCustomer()">Login</button>
-      <p class="info" id="loginMessage"></p>
-      <p class="info">New user? <a href="register.html">Register here</a></p>
-    </div>
+  <div class="login-box">
+    <h2>Welcome Back</h2>
+    <input type="text" id="loginEmail" placeholder="📧 Email or Mobile" />
+    <input type="password" id="loginPassword" placeholder="🔑 Password" />
+    <button onclick="loginCustomer()">Login</button>
+    <p class="info" id="loginMessage"></p>
+    <p class="info">New user? <a href="register.html">Register here</a></p>
   </div>
 
   <footer>
     © 2025 Suriyawan Saffari – All rights reserved
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    async function loginCustomer() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const msg = document.getElementById("loginMessage");
+
+      if (!email || !password) {
+        msg.textContent = "⚠️ Please fill all fields.";
+        return;
+      }
+
+      try {
+        const res = await fetch("https://suriyawan-backend-68z3.onrender.com/api/customer/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: email, password: password })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+          msg.textContent = "❌ " + (data.message || "Login failed.");
+          return;
+        }
+
+        // Save token and user info in localStorage
+        localStorage.setItem("customerToken", data.token);
+        localStorage.setItem("customerName", data.username || "Customer");
+
+        msg.textContent = "✅ Login successful. Redirecting...";
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1000);
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "🚫 Server error. Try again.";
+      }
+    }
+  </script>
 </body>
 </html>
