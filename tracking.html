@@ -2,62 +2,130 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Tracking Generator</title>
+  <title>📦 Tracking Generator – Suriyawan Saffari</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: Arial; padding: 2rem; background: #f5f5f5; }
-    input, button { margin: 5px; padding: 8px; }
-    .card { background: white; padding: 1rem; margin: 1rem 0; border-radius: 8px; box-shadow: 0 0 4px #aaa; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    h2, h3 {
+      color: #ff6f00;
+      margin-bottom: 10px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: calc(100% - 22px);
+      max-width: 350px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 16px;
+      margin-top: 10px;
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #e67e22;
+    }
+
+    .card {
+      background: white;
+      padding: 16px;
+      margin: 15px 0;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    .card img {
+      margin-top: 10px;
+      max-width: 100%;
+      height: 50px;
+    }
+
+    #output {
+      margin-top: 20px;
+    }
+
+    @media screen and (max-width: 600px) {
+      input {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>📦 Tracking ID Generator</h2>
+  <h2>📦 Create New Tracking ID</h2>
 
   <div>
     <input id="pname" placeholder="Product Name" />
-    <input id="price" placeholder="Price" />
+    <input id="price" placeholder="Price (₹)" />
     <input id="cname" placeholder="Customer Name" />
-    <input id="addr" placeholder="Address" />
-    <input id="mobile" placeholder="Mobile" />
-    <button onclick="create()">Generate</button>
+    <input id="addr" placeholder="Full Address" />
+    <input id="mobile" placeholder="Mobile Number" />
+    <button onclick="create()">➕ Generate Tracking ID</button>
   </div>
 
-  <h3>🔍 Search Tracking ID:</h3>
-  <input id="search" placeholder="Enter ID" oninput="load()" />
+  <h3>🔍 Search Tracking ID</h3>
+  <input id="search" placeholder="Enter Tracking ID or Name" oninput="load()" />
 
   <div id="output"></div>
 
   <script>
+    const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
     const token = localStorage.getItem("ownerToken");
 
     function create() {
       const data = {
-        productName: pname.value,
-        price: price.value,
-        customerName: cname.value,
-        address: addr.value,
-        mobile: mobile.value,
+        productName: pname.value.trim(),
+        price: price.value.trim(),
+        customerName: cname.value.trim(),
+        address: addr.value.trim(),
+        mobile: mobile.value.trim(),
       };
 
-      fetch("https://suriyawan-backend-68z3.onrender.com/api/tracking/create", {
+      if (!data.productName || !data.price || !data.customerName || !data.address || !data.mobile) {
+        alert("⚠️ All fields are required!");
+        return;
+      }
+
+      fetch(`${BASE_URL}/api/tracking/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token,
+          "Authorization": "Bearer " + token
         },
         body: JSON.stringify(data)
       })
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert("✅ Tracking ID: " + res.trackingId);
+          alert("✅ Tracking ID created: " + res.trackingId);
           load();
+        } else {
+          alert("❌ Failed to create: " + (res.message || "Unknown error"));
         }
-      });
+      })
+      .catch(() => alert("❌ Server error"));
     }
 
     function load() {
-      const query = search.value;
-      fetch(`https://suriyawan-backend-68z3.onrender.com/api/tracking/all?search=${query}`, {
+      const query = search.value.trim();
+
+      fetch(`${BASE_URL}/api/tracking/all?search=${query}`, {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(res => res.json())
@@ -65,17 +133,23 @@
         if (res.success) {
           output.innerHTML = res.data.map(x => `
             <div class="card">
-              <b>Tracking ID:</b> ${x.trackingId} <br>
-              <b>Product:</b> ${x.productName} | ₹${x.price}<br>
-              <b>Customer:</b> ${x.customerName} (${x.mobile})<br>
-              <b>Address:</b> ${x.address}<br>
-              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" />
+              <b>🆔 Tracking ID:</b> ${x.trackingId}<br>
+              <b>📦 Product:</b> ${x.productName} (₹${x.price})<br>
+              <b>👤 Customer:</b> ${x.customerName} | ${x.mobile}<br>
+              <b>🏠 Address:</b> ${x.address}<br>
+              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" alt="Barcode">
             </div>
           `).join("");
+        } else {
+          output.innerHTML = "<p>❌ No results found.</p>";
         }
+      })
+      .catch(() => {
+        output.innerHTML = "<p>❌ Failed to load tracking data.</p>";
       });
     }
 
+    // Load initial data
     load();
   </script>
 </body>
