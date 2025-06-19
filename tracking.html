@@ -18,12 +18,13 @@
 
     input {
       padding: 10px;
-      margin: 5px;
-      width: calc(100% - 22px);
-      max-width: 350px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 400px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 14px;
+      display: block;
     }
 
     button {
@@ -86,15 +87,15 @@
 
   <script>
     const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
-    const token = localStorage.getItem("ownerToken");
+    const token = localStorage.getItem("ownerToken") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InByYWRlZXBzZXRoNjQ2IiwiaWF0IjoxNzQ5ODk5NzI4LCJleHAiOjE3NDk5MDY5Mjh9.xFpbbAnE1MphCMDQQXprpsURy-x4UK7DrR_lFjlTVYE";
 
     function create() {
       const data = {
-        productName: pname.value.trim(),
-        price: price.value.trim(),
-        customerName: cname.value.trim(),
-        address: addr.value.trim(),
-        mobile: mobile.value.trim(),
+        productName: document.getElementById("pname").value.trim(),
+        price: document.getElementById("price").value.trim(),
+        customerName: document.getElementById("cname").value.trim(),
+        address: document.getElementById("addr").value.trim(),
+        mobile: document.getElementById("mobile").value.trim(),
       };
 
       if (!data.productName || !data.price || !data.customerName || !data.address || !data.mobile) {
@@ -116,14 +117,14 @@
           alert("✅ Tracking ID created: " + res.trackingId);
           load();
         } else {
-          alert("❌ Failed to create: " + (res.message || "Unknown error"));
+          alert("❌ Failed: " + (res.message || "Unknown error"));
         }
       })
       .catch(() => alert("❌ Server error"));
     }
 
     function load() {
-      const query = search.value.trim();
+      const query = document.getElementById("search").value.trim();
 
       fetch(`${BASE_URL}/api/tracking/all?search=${query}`, {
         headers: { "Authorization": "Bearer " + token }
@@ -131,7 +132,7 @@
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          output.innerHTML = res.data.map(x => `
+          document.getElementById("output").innerHTML = res.data.map(x => `
             <div class="card">
               <b>🆔 Tracking ID:</b> ${x.trackingId}<br>
               <b>📦 Product:</b> ${x.productName} (₹${x.price})<br>
@@ -141,15 +142,15 @@
             </div>
           `).join("");
         } else {
-          output.innerHTML = "<p>❌ No results found.</p>";
+          document.getElementById("output").innerHTML = "<p>❌ No results found.</p>";
         }
       })
       .catch(() => {
-        output.innerHTML = "<p>❌ Failed to load tracking data.</p>";
+        document.getElementById("output").innerHTML = "<p>❌ Failed to load data.</p>";
       });
     }
 
-    // Load initial data
+    // Load on start
     load();
   </script>
 </body>
