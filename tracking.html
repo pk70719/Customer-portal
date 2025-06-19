@@ -1,74 +1,146 @@
-<script>
-  const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
-  const STATIC_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InByYWRlZXBzZXRoNjQ2IiwiaWF0IjoxNzQ5ODk5NzI4LCJleHAiOjE3NDk5MDY5Mjh9.xFpbbAnE1MphCMDQQXprpsURy-x4UK7DrR_lFjlTVYE";
-
-  localStorage.setItem("ownerToken", STATIC_TOKEN);
-  const token = STATIC_TOKEN;
-
-  function create() {
-    const pname = document.getElementById("pname").value.trim();
-    const price = document.getElementById("price").value.trim();
-    const cname = document.getElementById("cname").value.trim();
-    const addr = document.getElementById("addr").value.trim();
-    const mobile = document.getElementById("mobile").value.trim();
-
-    if (!pname || !price || !cname || !addr || !mobile) {
-      return alert("⚠️ Please fill all fields.");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📦 Suriyawan Live Tracking System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
     }
 
-    const data = { productName: pname, price, customerName: cname, address: addr, mobile };
+    h2 {
+      color: #d84315;
+      margin-bottom: 12px;
+    }
 
-    fetch(`${BASE_URL}/api/tracking/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        alert("✅ Tracking Created: " + res.trackingId);
-        load();
-      } else {
-        alert("❌ Failed: " + (res.message || "Unknown error"));
+    input, button {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      padding: 10px;
+      margin: 6px 0;
+      font-size: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #f57c00;
+    }
+
+    .card {
+      background: #fff;
+      padding: 15px;
+      margin: 12px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .card img {
+      margin-top: 10px;
+      height: 50px;
+    }
+
+    #output {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📦 Generate Tracking ID</h2>
+  <input id="productName" placeholder="Product Name" />
+  <input id="price" placeholder="Price (₹)" />
+  <input id="customerName" placeholder="Customer Name" />
+  <input id="address" placeholder="Address" />
+  <input id="mobile" placeholder="Mobile Number" />
+  <button onclick="generateTracking()">➕ Generate</button>
+
+  <h2>🔍 Search Tracking</h2>
+  <input id="search" placeholder="Enter Tracking ID or Name" oninput="searchTracking()" />
+
+  <div id="output"></div>
+
+  <script>
+    const BASE_URL = "https://suriyawan-backend-68z3.onrender.com";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InByYWRlZXBzZXRoNjQ2IiwiaWF0IjoxNzQ5ODk5NzI4LCJleHAiOjE3NDk5MDY5Mjh9.xFpbbAnE1MphCMDQQXprpsURy-x4UK7DrR_lFjlTVYE";
+
+    function generateTracking() {
+      const data = {
+        productName: document.getElementById("productName").value.trim(),
+        price: document.getElementById("price").value.trim(),
+        customerName: document.getElementById("customerName").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        mobile: document.getElementById("mobile").value.trim()
+      };
+
+      if (Object.values(data).some(val => !val)) {
+        return alert("⚠️ All fields are required.");
       }
-    })
-    .catch(err => {
-      alert("❌ Server error.");
-      console.error(err);
-    });
-  }
 
-  function load() {
-    const search = document.getElementById("search").value.trim();
+      fetch(`${BASE_URL}/api/tracking/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert("✅ Tracking ID created: " + res.trackingId);
+          searchTracking(); // Refresh list
+        } else {
+          alert("❌ " + (res.message || "Error occurred."));
+        }
+      })
+      .catch(() => alert("❌ Network error"));
+    }
 
-    fetch(`${BASE_URL}/api/tracking/all?search=${search}`, {
-      headers: { "Authorization": "Bearer " + token }
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        const html = res.data.map(x => `
-          <div class="card">
-            <b>🆔 Tracking ID:</b> ${x.trackingId}<br>
-            <b>📦 Product:</b> ${x.productName} – ₹${x.price}<br>
-            <b>👤 Customer:</b> ${x.customerName} (${x.mobile})<br>
-            <b>🏠 Address:</b> ${x.address}<br>
-            <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" />
-          </div>
-        `).join("");
-        document.getElementById("output").innerHTML = html;
-      } else {
-        document.getElementById("output").innerHTML = "<p>❌ No data found</p>";
-      }
-    })
-    .catch(err => {
-      document.getElementById("output").innerHTML = "<p>❌ Network error</p>";
-      console.error(err);
-    });
-  }
+    function searchTracking() {
+      const search = document.getElementById("search").value.trim();
 
-  load();
-</script>
+      fetch(`${BASE_URL}/api/tracking/all?search=${search}`, {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      })
+      .then(res => res.json())
+      .then(res => {
+        const output = document.getElementById("output");
+        if (res.success && res.data.length) {
+          output.innerHTML = res.data.map(x => `
+            <div class="card">
+              <b>🆔 ID:</b> ${x.trackingId}<br>
+              <b>📦 Product:</b> ${x.productName} (₹${x.price})<br>
+              <b>👤 Customer:</b> ${x.customerName} (${x.mobile})<br>
+              <b>🏠 Address:</b> ${x.address}<br>
+              <img src="https://barcode.tec-it.com/barcode.ashx?data=${x.trackingId}&code=Code128" alt="Barcode" />
+            </div>
+          `).join("");
+        } else {
+          output.innerHTML = "<p>❌ No matching records found.</p>";
+        }
+      })
+      .catch(() => {
+        document.getElementById("output").innerHTML = "<p>❌ Server error</p>";
+      });
+    }
+
+    // Auto-load on open
+    searchTracking();
+  </script>
+</body>
+</html>
