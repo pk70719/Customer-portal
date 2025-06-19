@@ -40,9 +40,7 @@
           <th>Total (₹)</th>
         </tr>
       </thead>
-      <tbody id="itemRows">
-        <!-- Items will be inserted here -->
-      </tbody>
+      <tbody id="itemRows"></tbody>
       <tfoot class="totals">
         <tr>
           <td colspan="3">Grand Total</td>
@@ -57,39 +55,56 @@
   </div>
 
   <script>
-    // Dummy example data (you can load from localStorage or API)
-    const invoiceData = JSON.parse(localStorage.getItem("invoiceData")) || {
-      id: "INV12345678",
-      customerName: "Ravi Kumar",
-      address: "Suriyawan, Bhadohi, UP",
-      mobile: "9876543210",
-      items: [
-        { name: "Shirt", qty: 2, price: 499 },
-        { name: "Shoes", qty: 1, price: 1199 }
-      ]
-    };
+    const token = localStorage.getItem("customerToken");
+    const invoiceId = new URLSearchParams(window.location.search).get("id") || "latest";
 
-    document.getElementById("invoiceId").textContent = invoiceData.id;
-    document.getElementById("customerName").textContent = invoiceData.customerName;
-    document.getElementById("customerAddress").textContent = invoiceData.address;
-    document.getElementById("customerMobile").textContent = invoiceData.mobile;
+    async function loadInvoice() {
+      try {
+        const res = await fetch(`https://suriyawan-backend-68z3.onrender.com/api/customer/invoice/${invoiceId}`, {
+          method: "GET",
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        });
 
-    const rowsContainer = document.getElementById("itemRows");
-    let grandTotal = 0;
-    invoiceData.items.forEach(item => {
-      const total = item.qty * item.price;
-      grandTotal += total;
+        const data = await res.json();
+        if (!data.success) {
+          alert("❌ Failed to load invoice");
+          return;
+        }
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-        <td>₹${item.price}</td>
-        <td>₹${total}</td>
-      `;
-      rowsContainer.appendChild(row);
-    });
-    document.getElementById("grandTotal").textContent = "₹" + grandTotal;
+        const invoice = data.invoice;
+        document.getElementById("invoiceId").textContent = invoice._id || "N/A";
+        document.getElementById("customerName").textContent = invoice.customerName || "N/A";
+        document.getElementById("customerAddress").textContent = invoice.address || "N/A";
+        document.getElementById("customerMobile").textContent = invoice.mobile || "N/A";
+
+        const tbody = document.getElementById("itemRows");
+        tbody.innerHTML = "";
+        let total = 0;
+
+        invoice.items.forEach(item => {
+          const row = document.createElement("tr");
+          const itemTotal = item.qty * item.price;
+          total += itemTotal;
+          row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>₹${item.price}</td>
+            <td>₹${itemTotal}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        document.getElementById("grandTotal").textContent = "₹" + total;
+
+      } catch (err) {
+        console.error("Invoice load error:", err);
+        alert("❌ Error loading invoice");
+      }
+    }
+
+    loadInvoice();
   </script>
 </body>
 </html>
