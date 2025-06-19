@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Customer Dashboard – Suriyawan Saffari</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #f2f5fa; }
+    header { background: #007bff; color: white; padding: 1rem; text-align: center; font-size: 1.2rem; }
+    nav { display: flex; justify-content: center; gap: 1rem; padding: 1rem; background: #e6eefa; flex-wrap: wrap; }
+    nav button { padding: 10px 16px; border: none; background: #0056b3; color: white; border-radius: 6px; cursor: pointer; }
+    nav button:hover { background: #00409c; }
+    .container { max-width: 800px; margin: auto; padding: 2rem; }
+    .card { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+    .info { color: #555; margin-top: 1rem; }
+    footer { text-align: center; padding: 1rem; font-size: 0.9rem; color: #888; }
+    input[type="text"] { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; margin-top: 0.5rem; }
+    #dashboardChatResponse { margin-top: 1rem; font-style: italic; }
+  </style>
 </head>
 <body>
 
@@ -23,7 +36,7 @@
   <div class="container">
     <div class="card">
       <h2>👋 Hello, <span id="customerName">Customer</span></h2>
-      <p class="status" id="dashboardStatus">Dashboard loaded successfully.</p>
+      <p class="status" id="dashboardStatus">Dashboard loading...</p>
       <p class="info">You can track orders, update your profile, or browse new products.</p>
     </div>
 
@@ -39,6 +52,58 @@
     © 2025 Suriyawan Saffari – Customer Support | Dashboard
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    const token = localStorage.getItem("customerToken");
+    const customerData = JSON.parse(localStorage.getItem("customerData") || "{}");
+
+    if (!token) {
+      alert("⚠️ Please login first.");
+      window.location.href = "login.html";
+    }
+
+    document.getElementById("customerName").innerText = customerData.name || "Customer";
+    document.getElementById("dashboardStatus").innerText = "✅ Dashboard loaded successfully.";
+
+    function logoutCustomer() {
+      localStorage.removeItem("customerToken");
+      localStorage.removeItem("customerData");
+      window.location.href = "login.html";
+    }
+
+    function navigate(page) {
+      alert("🚧 Page '" + page + "' is under construction!");
+      // You can replace this with real navigation
+      // window.location.href = page + ".html";
+    }
+
+    async function askDashboardAI() {
+      const input = document.getElementById("dashboardChatInput").value.trim();
+      const responseBox = document.getElementById("dashboardChatResponse");
+
+      if (!input) {
+        responseBox.innerText = "⚠️ Please ask something.";
+        return;
+      }
+
+      responseBox.innerText = "⏳ Thinking...";
+
+      try {
+        const res = await fetch("https://suriyawan-backend-68z3.onrender.com/api/customer/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+          },
+          body: JSON.stringify({ question: input })
+        });
+
+        const data = await res.json();
+        responseBox.innerText = data.answer || "🤖 Sorry, no reply.";
+      } catch (err) {
+        console.error(err);
+        responseBox.innerText = "❌ Error connecting to support.";
+      }
+    }
+  </script>
 </body>
 </html>
