@@ -81,7 +81,7 @@
 
   <div class="login-box">
     <h2>Welcome Back</h2>
-    <input type="text" id="loginEmail" placeholder="📧 Email or Mobile" />
+    <input type="text" id="loginEmail" placeholder="📧 Email" />
     <input type="password" id="loginPassword" placeholder="🔑 Password" />
     <button onclick="loginCustomer()">Login</button>
     <p class="info" id="loginMessage"></p>
@@ -99,7 +99,7 @@
       const msg = document.getElementById("loginMessage");
 
       if (!email || !password) {
-        msg.textContent = "⚠️ Please fill all fields.";
+        msg.textContent = "❌ 📧 Email aur 🔑 password required hai.";
         return;
       }
 
@@ -107,7 +107,8 @@
         const res = await fetch("https://suriyawan-backend-68z3.onrender.com/api/customer/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: email, password: password })
+          credentials: "include", // ✅ Required if using cookies
+          body: JSON.stringify({ email, password }) // ✅ FIXED: use email not username
         });
 
         const data = await res.json();
@@ -117,13 +118,9 @@
           return;
         }
 
-        // Save token and user info in localStorage
-        localStorage.setItem("customerToken", data.token);
-        localStorage.setItem("customerName", data.username || "Customer");
-
         msg.textContent = "✅ Login successful. Redirecting...";
         setTimeout(() => {
-          window.location.href = "dashboard.html";
+          window.location.href = "dashboard.html"; // ✅ make sure this file exists
         }, 1000);
       } catch (err) {
         console.error(err);
